@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">FurorTask</string>
+    <string name="todo">TODO</string>
+    <string name="id">id:</string>
+</resources>

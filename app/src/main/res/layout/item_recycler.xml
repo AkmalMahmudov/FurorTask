@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/white"
+    android:elevation="10dp"
+    android:orientation="vertical"
+    app:cardCornerRadius="10dp"
+    app:cardElevation="2dp"
+    app:cardMaxElevation="10dp"
+    app:cardUseCompatPadding="true">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:orientation="horizontal"
+        android:paddingVertical="12dp"
+        android:paddingStart="12dp"
+        tools:ignore="RtlSymmetry">
+
+        <View
+            android:id="@+id/line"
+            android:layout_width="5dp"
+            android:layout_height="72dp"
+            android:background="@drawable/line_blue"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:fontFamily="@font/convergence"
+            android:textColor="#15274C"
+            android:textSize="20sp"
+            app:layout_constraintLeft_toRightOf="@id/line"
+            app:layout_constraintTop_toTopOf="@id/line"
+            tools:text="Lewis Hamilton" />
+
+        <TextView
+            android:id="@+id/address"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:fontFamily="@font/convergence"
+            android:textColor="#8C97B0"
+            android:textSize="16sp"
+            app:layout_constraintLeft_toRightOf="@id/line"
+            app:layout_constraintTop_toBottomOf="@id/name"
+            tools:text="London, UK" />
+
+        <TextView
+            android:id="@+id/hour"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/convergence"
+            android:text="@string/id"
+            android:textColor="#15274C"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toBottomOf="@id/line"
+            app:layout_constraintLeft_toLeftOf="@id/name"
+            app:layout_constraintRight_toLeftOf="@id/id" />
+
+        <TextView
+            android:id="@+id/id"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/convergence"
+            android:textColor="#15274C"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toBottomOf="@id/line"
+            app:layout_constraintLeft_toRightOf="@id/hour"
+            tools:text="00" />
+
+        <TextView
+            android:id="@+id/price"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@color/yellow"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="2dp"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="15$" />
+
+        <TextView
+            android:id="@+id/date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="12dp"
+            android:fontFamily="@font/convergence"
+            android:textColor="#15274C"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            tools:text="22 Feb 2022" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.cardview.widget.CardView>
