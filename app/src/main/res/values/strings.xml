@@ -2,4 +2,9 @@
     <string name="app_name">FurorTask</string>
     <string name="todo">TODO</string>
     <string name="id">id:</string>
+    <string name="edit">Edit</string>
+    <string name="delete">Delete</string>
+    <string name="address">Address</string>
+    <string name="cost">Cost</string>
+    <string name="name">Name</string>
 </resources>

@@ -17,5 +17,21 @@
     <fragment
         android:id="@+id/mainScreen"
         android:name="uz.akmal.furortask.ui.screens.MainScreen"
-        android:label="MainScreen" />
+        android:label="MainScreen">
+        <action
+            android:id="@+id/action_mainScreen_to_bottomSheetDialog"
+            app:destination="@id/bottomSheetDialog" />
+    </fragment>
+    <dialog
+        android:id="@+id/bottomSheetDialog"
+        android:name="uz.akmal.furortask.ui.screens.BottomSheetDialog"
+        android:label="BottomSheetDialog">
+        <action
+            android:id="@+id/action_bottomSheetDialog_to_mainScreen"
+            app:destination="@id/mainScreen" />
+        <argument
+            android:name="itemNumber"
+            android:defaultValue="0"
+            app:argType="integer" />
+    </dialog>
 </navigation>

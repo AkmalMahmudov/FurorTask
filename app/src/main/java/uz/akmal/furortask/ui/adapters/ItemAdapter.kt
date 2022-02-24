@@ -10,7 +10,18 @@ import uz.akmal.furortask.model.data.response.GetItemResponse
 class ItemAdapter : RecyclerView.Adapter<ItemAdapter.ViewHolder>() {
     private val ls = ArrayList<GetItemResponse>()
 
-    inner class ViewHolder(val binding: ItemRecyclerBinding) : RecyclerView.ViewHolder(binding.root)
+    var itemClickListener: ((String) -> Unit)? = null
+    fun itemClickListener(block: (String) -> Unit) {
+        itemClickListener = block
+    }
+
+    inner class ViewHolder(val binding: ItemRecyclerBinding) : RecyclerView.ViewHolder(binding.root) {
+        init {
+            itemView.setOnClickListener {
+                itemClickListener?.invoke(absoluteAdapterPosition.toString())
+            }
+        }
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = ItemRecyclerBinding.inflate(LayoutInflater.from(parent.context), parent, false)
