@@ -92,7 +92,7 @@ class MainScreen : Fragment(R.layout.fragment_main) {
         var named = ""
         var addressed = ""
         var costed = 0F
-
+//kkkk
         val binding = ItemDialogBinding.inflate(LayoutInflater.from(context), null, false)
         val alertDialog = Dialog(requireContext())
         alertDialog.apply {
