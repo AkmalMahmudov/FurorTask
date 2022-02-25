@@ -88,7 +88,7 @@ class MainScreen : Fragment(R.layout.fragment_main) {
             }
         }
         viewModel.getItemsRoom.observe(viewLifecycleOwner) {
-            Log.d("TTT", "hello" + it[1].name_uz)
+            Log.d("TTT", "$it")
         }
     }
 
