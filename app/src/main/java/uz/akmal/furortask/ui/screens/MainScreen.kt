@@ -5,6 +5,7 @@ import android.app.AlertDialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
+import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -15,7 +16,6 @@ import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import uz.akmal.furortask.R
 import uz.akmal.furortask.databinding.FragmentMainBinding
-import uz.akmal.furortask.databinding.ItemDialogBinding
 import uz.akmal.furortask.model.data.response.GetItemResponse
 import uz.akmal.furortask.ui.adapters.ItemAdapter
 import uz.akmal.furortask.util.CurrencyEvent
@@ -55,7 +55,7 @@ class MainScreen : Fragment(R.layout.fragment_main) {
             more.setOnClickListener { }
             search.setOnClickListener { }
             fab.setOnClickListener {
-
+                openDialog()
             }
         }
     }
@@ -72,8 +72,6 @@ class MainScreen : Fragment(R.layout.fragment_main) {
                 is CurrencyEvent.Success<*> -> {
                     binding.progressbar.isVisible = false
                     val list = it.data as ArrayList<GetItemResponse>
-                    val list2 = it.data as ArrayList<GetItemResponse>
-                    list.addAll(list2)
                     adapter.submitList(list)
 
                 }
@@ -86,22 +84,31 @@ class MainScreen : Fragment(R.layout.fragment_main) {
     @SuppressLint("InflateParams")
     private fun openDialog() {
         val builder = AlertDialog.Builder(context)
-//        val inflater: LayoutInflater = layoutInflater
-//        val dialogLayout = inflater.inflate(R.layout.item_dialog, null)
-        val binding = ItemDialogBinding.inflate(LayoutInflater.from(context), null, false)
+        val binding = uz.akmal.furortask.databinding.ItemDialogBinding.inflate(LayoutInflater.from(context), null, false)
+        builder.setView(binding.root)
 
         builder.apply {
             setTitle("Fill the form")
             setPositiveButton("OK") { dialog, which ->
-                name = binding.inputName.text.toString()
-                address = binding.inputAddress.text.toString()
-                cost = binding.inputCost.text.toString().toInt()
+                if (binding.inputName.text.isNullOrBlank()) {
+                    binding.name.error = "Required"
+                }
+                if (binding.inputAddress.text.isNullOrEmpty()) {
+                    binding.inputAddress.error = "Required"
+                }
+                if (binding.inputCost.text.isNullOrBlank()) {
+                    binding.cost.error = "Required"
+                } else {
+                    name = binding.inputName.text.toString()
+                    address = binding.inputAddress.text.toString()
+                    cost = binding.inputCost.text.toString().toInt()
+                }
+                Toast.makeText(context, "$name, $address, $cost", Toast.LENGTH_SHORT).show()
             }
             setNegativeButton("Cancel") { dialog, which ->
                 dialog.dismiss()
             }
             show()
         }
-
     }
 }
