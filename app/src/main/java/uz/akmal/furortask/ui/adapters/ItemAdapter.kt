@@ -41,6 +41,7 @@ class ItemAdapter : RecyclerView.Adapter<ItemAdapter.ViewHolder>() {
 
     override fun getItemCount() = ls.size
 
+    @SuppressLint("NotifyDataSetChanged")
     fun submitList(data: List<GetItemResponse>) {
        ls.clear()
         ls.addAll(data)

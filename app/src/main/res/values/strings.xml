@@ -7,4 +7,7 @@
     <string name="address">Address</string>
     <string name="cost">Cost</string>
     <string name="name">Name</string>
+    <string name="ok">OK</string>
+    <string name="cancel">cancel</string>
+    <string name="fill_the_form">Fill the form</string>
 </resources>

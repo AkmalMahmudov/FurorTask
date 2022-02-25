@@ -1,15 +1,15 @@
 package uz.akmal.furortask.ui.screens
 
-import android.annotation.SuppressLint
-import android.app.AlertDialog
+import android.app.Dialog
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
-import android.widget.Toast
+import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
@@ -17,6 +17,7 @@ import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import uz.akmal.furortask.R
 import uz.akmal.furortask.databinding.FragmentMainBinding
+import uz.akmal.furortask.databinding.ItemDialogBinding
 import uz.akmal.furortask.model.data.response.GetItemResponse
 import uz.akmal.furortask.ui.adapters.ItemAdapter
 import uz.akmal.furortask.util.CurrencyEvent
@@ -27,23 +28,21 @@ class MainScreen : Fragment(R.layout.fragment_main) {
     private val binding by viewBinding(FragmentMainBinding::bind)
     private val viewModel: MainViewModel by viewModels()
     lateinit var adapter: ItemAdapter
-    var name = ""
-    var address = ""
-    var cost = 0
     private val perPage = 5
     private var currentPage = 1
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         loadViews()
-//        viewModel.getList()
         viewModel.getListPaging(currentPage++, perPage)
         clickReceiver()
         observe()
     }
 
     private fun loadViews() {
-
+        binding.swipeRefresh.setOnRefreshListener {
+            binding.swipeRefresh.isRefreshing = false
+        }
         adapter = ItemAdapter()
         binding.recycler.layoutManager =
             LinearLayoutManager(requireActivity(), LinearLayoutManager.VERTICAL, false)
@@ -52,9 +51,9 @@ class MainScreen : Fragment(R.layout.fragment_main) {
     }
 
     private fun clickReceiver() {
-//        adapter.itemClickListener {
-//            findNavController().navigate(MainScreenDirections.actionMainScreenToBottomSheetDialog(it.toInt()))
-//        }
+        adapter.itemClickListener {
+            findNavController().navigate(MainScreenDirections.actionMainScreenToBottomSheetDialog(it.toInt()))
+        }
         binding.apply {
             more.setOnClickListener { }
             search.setOnClickListener { }
@@ -65,24 +64,6 @@ class MainScreen : Fragment(R.layout.fragment_main) {
     }
 
     private fun observe() {
-        viewModel.filtersList.observe(viewLifecycleOwner) {
-            when (it) {
-                is CurrencyEvent.Failure -> {
-                    Snackbar.make(binding.root, it.errorText, Snackbar.LENGTH_SHORT).show()
-                }
-                is CurrencyEvent.Loading -> {
-                    binding.progressbar.isVisible = true
-                }
-                is CurrencyEvent.Success<*> -> {
-                    binding.progressbar.isVisible = false
-                    val list = it.data as ArrayList<GetItemResponse>
-                    adapter.submitList(list)
-
-                }
-                else -> {
-                }
-            }
-        }
         viewModel.getPaeList.observe(viewLifecycleOwner) {
             when (it) {
                 is CurrencyEvent.Failure -> {
@@ -106,34 +87,49 @@ class MainScreen : Fragment(R.layout.fragment_main) {
         }
     }
 
-    @SuppressLint("InflateParams")
     private fun openDialog() {
-        val builder = AlertDialog.Builder(context)
-        val binding = uz.akmal.furortask.databinding.ItemDialogBinding.inflate(LayoutInflater.from(context), null, false)
-        builder.setView(binding.root)
+        var named = ""
+        var addressed = ""
+        var costed = 0F
 
-        builder.apply {
+        val binding = ItemDialogBinding.inflate(LayoutInflater.from(context), null, false)
+        val alertDialog = Dialog(requireContext())
+        alertDialog.apply {
             setTitle("Fill the form")
-            setPositiveButton("OK") { dialog, which ->
-                if (binding.inputName.text.isNullOrBlank()) {
+            setContentView(binding.root)
+            setCancelable(false)
+            window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+            create()
+            show()
+        }
+        binding.apply {
+            ok.setOnClickListener {
+                if (inputName.text.isNullOrEmpty()) {
                     binding.name.error = "Required"
+                } else {
+                    binding.name.error = null
+                    named = inputName.text.toString()
                 }
-                if (binding.inputAddress.text.isNullOrEmpty()) {
-                    binding.inputAddress.error = "Required"
+                if (inputAddress.text.isNullOrEmpty()) {
+                    binding.address.error = "Required"
+                } else {
+                    binding.address.error = null
+                    addressed = inputAddress.text.toString()
                 }
-                if (binding.inputCost.text.isNullOrBlank()) {
+                if (inputCost.text.isNullOrEmpty()) {
                     binding.cost.error = "Required"
                 } else {
-                    name = binding.inputName.text.toString()
-                    address = binding.inputAddress.text.toString()
-                    cost = binding.inputCost.text.toString().toInt()
+                    binding.cost.error = null
+                    costed = inputCost.text.toString().toFloat()
                 }
-                Toast.makeText(context, "$name, $address, $cost", Toast.LENGTH_SHORT).show()
+
+                if (!inputName.text.isNullOrEmpty() && !inputAddress.text.isNullOrEmpty() && !inputCost.text.isNullOrEmpty()) {
+                    alertDialog.dismiss()
+                }
             }
-            setNegativeButton("Cancel") { dialog, which ->
-                dialog.dismiss()
+            cancel.setOnClickListener {
+                alertDialog.cancel()
             }
-            show()
         }
     }
 
