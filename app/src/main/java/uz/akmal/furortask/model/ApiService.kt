@@ -1,5 +1,9 @@
 package uz.akmal.furortask.model
 
+
+import com.google.gson.JsonObject
+
+import retrofit2.Call
 import retrofit2.Response
 import retrofit2.http.*
 import uz.akmal.furortask.model.data.response.GetItemResponse
@@ -18,6 +22,6 @@ interface ApiService {
     suspend fun updateItem(): Response<List<GetItemResponse>>
 
    @DELETE("api/product/{id}")
-    suspend fun deleteItem(@Path("id") id:Int): Response<String>
+    fun deleteItem(@Path("id") id:Int): Call<Any>
 
 }

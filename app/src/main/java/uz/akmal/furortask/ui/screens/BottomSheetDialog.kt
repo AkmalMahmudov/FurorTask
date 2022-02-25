@@ -1,7 +1,5 @@
 package uz.akmal.furortask.ui.screens
 
-import android.annotation.SuppressLint
-import android.app.Dialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -25,25 +23,26 @@ class BottomSheetDialog : BottomSheetDialogFragment() {
     private val navArgs: BottomSheetDialogArgs by navArgs()
     private val viewModel: MainViewModel by viewModels()
 
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.dialog_bottom, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setUpObServer()
         binding.c1.setOnClickListener {
             Toast.makeText(context, "${navArgs.itemNumber} edited", Toast.LENGTH_SHORT).show()
         }
         binding.c2.setOnClickListener {
             viewModel.deleteItem(navArgs.itemNumber)
-            Toast.makeText(context, "${navArgs.itemNumber} deleted", Toast.LENGTH_SHORT).show()
+//            Toast.makeText(context, "${navArgs.itemNumber} deleted", Toast.LENGTH_SHORT).show()
         }
     }
+    private fun setUpObServer(){
 
-    @SuppressLint("RestrictedApi")
-    override fun setupDialog(dialog: Dialog, style: Int) {
-        super.setupDialog(dialog, style)
         viewModel.deleteItem.observe(this) {
+            if(it!=null){
             when (it) {
                 is CurrencyEvent.Failure -> {
                     Snackbar.make(binding.root, it.errorText, Snackbar.LENGTH_SHORT).show()
@@ -52,13 +51,23 @@ class BottomSheetDialog : BottomSheetDialogFragment() {
 
                 }
                 is CurrencyEvent.Success<*> -> {
-                    dialog.dismiss()
-                    Toast.makeText(context, "${it.data}", Toast.LENGTH_SHORT).show()
-                    findNavController().navigateUp()
+                    findNavController().navigate(BottomSheetDialogDirections.actionBottomSheetDialogToMainScreen())
+                    dialog?.dismiss()
+
+                    Toast.makeText(context, "${navArgs.itemNumber}", Toast.LENGTH_SHORT).show()
+
                 }
                 else -> {
                 }
             }
+            viewModel.navigateDelete()
+
+            }
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        viewModel.navigateDelete()
     }
 }

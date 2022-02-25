@@ -54,7 +54,7 @@ class MainScreen : Fragment(R.layout.fragment_main) {
 
     private fun clickReceiver() {
         adapter.itemClickListener {
-            findNavController().navigate(MainScreenDirections.actionMainScreenToBottomSheetDialog(it.toInt()))
+            findNavController().navigate(MainScreenDirections.actionMainScreenToBottomSheetDialog(it))
         }
         binding.apply {
             more.setOnClickListener { }
@@ -67,6 +67,7 @@ class MainScreen : Fragment(R.layout.fragment_main) {
 
     private fun observe() {
         viewModel.getPaeList.observe(viewLifecycleOwner) {
+            if(it!=null){
             when (it) {
                 is CurrencyEvent.Failure -> {
                     Snackbar.make(binding.root, it.errorText, Snackbar.LENGTH_SHORT).show()
@@ -82,6 +83,8 @@ class MainScreen : Fragment(R.layout.fragment_main) {
                 }
                 else -> {
                 }
+            }
+            viewModel.navigate()
             }
         }
         viewModel.getItemsRoom.observe(viewLifecycleOwner) {
@@ -152,5 +155,10 @@ class MainScreen : Fragment(R.layout.fragment_main) {
                 }
             }
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        viewModel.navigate()
     }
 }

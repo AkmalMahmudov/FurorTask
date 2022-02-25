@@ -18,6 +18,7 @@
         android:background="@color/white"
         android:orientation="horizontal"
         android:paddingVertical="12dp"
+        android:id="@+id/item"
         android:paddingStart="12dp"
         tools:ignore="RtlSymmetry">
 
