@@ -3,11 +3,12 @@ package uz.akmal.furortask.ui.adapters
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import uz.akmal.furortask.databinding.ItemRecyclerBinding
 import uz.akmal.furortask.model.data.response.GetItemResponse
 
-class ItemAdapter : RecyclerView.Adapter<ItemAdapter.ViewHolder>() {
+class ItemAdapter : ListAdapter<GetItemResponse, ItemAdapter.ViewHolder>(GetItemResponse.ITEM_CALLBACK) {
     private val ls = ArrayList<GetItemResponse>()
 
     var itemClickListener: ((String) -> Unit)? = null
@@ -31,24 +32,14 @@ class ItemAdapter : RecyclerView.Adapter<ItemAdapter.ViewHolder>() {
     @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.binding.apply {
-            name.text = ls[position].name_uz
-            address.text = ls[position].address
-            id.text = ls[position].id.toString()
-            price.text = " ${ls[position].cost}$"
+            name.text = getItem(position).name_uz
+            address.text = getItem(position).address
+            id.text = getItem(position).id.toString()
+            price.text = " ${getItem(position).cost}$"
             date.text = "0"
         }
     }
 
-    override fun getItemCount() = ls.size
-
-    fun submitList(data: List<GetItemResponse>) {
-       ls.clear()
-        ls.addAll(data)
-        notifyDataSetChanged()
-    }
-    fun currentList():ArrayList<GetItemResponse>{
-        return ls
-    }
 
     fun removeItem(data: GetItemResponse) {
         val index = ls.indexOfFirst { it.id == data.id }

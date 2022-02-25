@@ -26,18 +26,18 @@ import uz.akmal.furortask.viewModel.MainViewModel
 class MainScreen : Fragment(R.layout.fragment_main) {
     private val binding by viewBinding(FragmentMainBinding::bind)
     private val viewModel: MainViewModel by viewModels()
-    lateinit var adapter: ItemAdapter
+    private lateinit var adapter: ItemAdapter
     var name = ""
     var address = ""
     var cost = 0
-    private val perPage = 5
+    private val perPage = 8
     private var currentPage = 1
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         loadViews()
 //        viewModel.getList()
-        viewModel.getListPaging(currentPage++, perPage)
+        viewModel.getListPaging(1, perPage)
         clickReceiver()
         observe()
     }
@@ -95,15 +95,16 @@ class MainScreen : Fragment(R.layout.fragment_main) {
                     binding.progressbar.isVisible = false
 
                     val list = it.data as ArrayList<GetItemResponse>
-                    val list2 = adapter.currentList()
-                    list.addAll(list2)
-                    adapter.submitList(list)
+                    val list2 = adapter.currentList.toMutableList()
+                    list2.addAll(list)
+                    adapter.submitList(list2)
 
                 }
                 else -> {
                 }
             }
         }
+            viewModel.navigate()
     }
 
     @SuppressLint("InflateParams")
@@ -141,11 +142,12 @@ class MainScreen : Fragment(R.layout.fragment_main) {
 
         override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
             super.onScrolled(recyclerView, dx, dy)
+//                Log.d("mkm", "onScrolled: $currentPage m")
 
             val layoutManager = recyclerView.layoutManager as LinearLayoutManager
-            if (currentPage == 1 && dy <= 0) {
+            if (currentPage++ == 1 && dy <= 0) {
                 viewModel.getListPaging(currentPage, perPage)
-                currentPage++
+//                currentPage++
             } else {
                 if (layoutManager.findLastVisibleItemPosition() >= currentPage * perPage - 1) {
                     viewModel.getListPaging(currentPage, perPage)
@@ -155,4 +157,9 @@ class MainScreen : Fragment(R.layout.fragment_main) {
             }
         }
     }
+
+//    override fun onDestroyView() {
+//        super.onDestroyView()
+//        viewModel.navigate()
+//    }
 }

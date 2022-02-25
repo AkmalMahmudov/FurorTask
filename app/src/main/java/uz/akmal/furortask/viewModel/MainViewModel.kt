@@ -36,5 +36,7 @@ class MainViewModel @Inject constructor(private val repository: MainRepository) 
             }
         }
     }
-
+ fun navigate(){
+     _getPageList.value=null
+ }
 }

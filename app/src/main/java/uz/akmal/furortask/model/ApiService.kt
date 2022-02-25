@@ -1,9 +1,7 @@
 package uz.akmal.furortask.model
 
-import retrofit2.Call
 import retrofit2.Response
 import retrofit2.http.*
-import uz.akmal.furortask.model.data.request.GetItemPaging
 import uz.akmal.furortask.model.data.response.GetItemResponse
 
 interface ApiService {
