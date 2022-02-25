@@ -7,6 +7,7 @@ import uz.akmal.furortask.model.data.response.GetItemResponse
 interface ApiService {
     @GET("api/product")
     suspend fun getItemsList(): Response<List<GetItemResponse>>
+
     @GET("api/product")
     suspend fun getItemsAll(@Query ("page")page:Int, @Query("perPage") perPage:Int): Response<List<GetItemResponse>>
 
@@ -15,7 +16,6 @@ interface ApiService {
 
     @PUT("api/product")
     suspend fun updateItem(): Response<List<GetItemResponse>>
-
 
     @HTTP(method = "DELETE", path = "api/product", hasBody = true)
     suspend fun deleteItem(@Body id:Int): Response<List<String>>

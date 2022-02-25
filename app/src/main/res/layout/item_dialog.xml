@@ -1,11 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/white"
-    android:orientation="vertical"
-    android:padding="24dp">
+    android:paddingHorizontal="24dp"
+    android:paddingTop="24dp"
+    android:paddingBottom="8dp">
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="6dp"
+        android:text="@string/fill_the_form"
+        android:textColor="@color/black"
+        android:textSize="22sp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/name"
@@ -19,6 +31,7 @@
         app:errorEnabled="true"
         app:errorIconDrawable="@drawable/ic_error"
         app:hintTextColor="@color/black"
+        app:layout_constraintTop_toBottomOf="@id/title"
         app:startIconDrawable="@drawable/ic_content">
 
         <com.google.android.material.textfield.TextInputEditText
@@ -41,6 +54,7 @@
         app:errorEnabled="true"
         app:errorIconDrawable="@drawable/ic_error"
         app:hintTextColor="@color/black"
+        app:layout_constraintTop_toBottomOf="@id/name"
         app:startIconDrawable="@drawable/ic_location">
 
         <com.google.android.material.textfield.TextInputEditText
@@ -62,6 +76,7 @@
         app:errorEnabled="true"
         app:errorIconDrawable="@drawable/ic_error"
         app:hintTextColor="@color/black"
+        app:layout_constraintTop_toBottomOf="@id/address"
         app:startIconDrawable="@drawable/ic_money">
 
         <com.google.android.material.textfield.TextInputEditText
@@ -72,4 +87,26 @@
             android:inputType="numberDecimal" />
     </com.google.android.material.textfield.TextInputLayout>
 
-</androidx.appcompat.widget.LinearLayoutCompat>
+    <Button
+        android:id="@+id/ok"
+        style="@style/Widget.MaterialComponents.Button.TextButton"
+        android:layout_width="56dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="@string/ok"
+        android:textColor="@color/blue"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/cost" />
+
+    <Button
+        android:id="@+id/cancel"
+        style="@style/Widget.MaterialComponents.Button.TextButton"
+        android:layout_width="86dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:text="@string/cancel"
+        android:textColor="@color/blue"
+        app:layout_constraintRight_toLeftOf="@id/ok"
+        app:layout_constraintTop_toTopOf="@id/ok" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

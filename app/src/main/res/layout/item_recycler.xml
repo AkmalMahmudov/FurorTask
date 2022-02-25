@@ -32,10 +32,11 @@
 
         <TextView
             android:id="@+id/name"
-            android:layout_width="wrap_content"
+            android:layout_width="200dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:fontFamily="@font/convergence"
+            android:maxLines="1"
             android:textColor="#15274C"
             android:textSize="20sp"
             app:layout_constraintLeft_toRightOf="@id/line"
@@ -44,10 +45,11 @@
 
         <TextView
             android:id="@+id/address"
-            android:layout_width="wrap_content"
+            android:layout_width="200dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:fontFamily="@font/convergence"
+            android:maxLines="1"
             android:textColor="#8C97B0"
             android:textSize="16sp"
             app:layout_constraintLeft_toRightOf="@id/line"
