@@ -9,6 +9,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import uz.akmal.furortask.model.MainRepository
+import uz.akmal.furortask.model.data.response.GetItemResponse
 import uz.akmal.furortask.util.CurrencyEvent
 import javax.inject.Inject
 
@@ -18,6 +19,9 @@ class MainViewModel @Inject constructor(private val repository: MainRepository) 
     val getPaeList: LiveData<CurrencyEvent?> get() = _getPageList
     private var _deleteItem = MutableLiveData<CurrencyEvent?>()
     val deleteItem: LiveData<CurrencyEvent?> get() = _deleteItem
+
+    private var _getItemsRoom = MutableLiveData<List<GetItemResponse>>()
+    val getItemsRoom: LiveData<List<GetItemResponse>> get() = _getItemsRoom
 
     fun getListPaging(page: Int, perPage: Int) {
         CoroutineScope(Dispatchers.IO).launch {
@@ -43,5 +47,17 @@ class MainViewModel @Inject constructor(private val repository: MainRepository) 
 
     fun navigateDelete() {
         _deleteItem.value = null
+    }
+
+    fun insertAllRoom(list: List<GetItemResponse>) {
+        CoroutineScope(Dispatchers.IO).launch {
+            repository.insertAllRoom(list)
+        }
+    }
+
+    fun getItemsRoom() {
+        CoroutineScope(Dispatchers.IO).launch {
+            _getItemsRoom.postValue(repository.getItemsRoom())
+        }
     }
 }

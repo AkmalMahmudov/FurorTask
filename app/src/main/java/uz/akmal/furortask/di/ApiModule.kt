@@ -11,7 +11,6 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 class ApiModule {
-
     @Singleton
     @Provides
     fun getApi(retrofit: Retrofit): ApiService = retrofit.create(ApiService::class.java)

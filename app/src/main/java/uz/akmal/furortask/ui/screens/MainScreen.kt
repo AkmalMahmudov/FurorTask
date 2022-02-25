@@ -36,6 +36,7 @@ class MainScreen : Fragment(R.layout.fragment_main) {
         loadViews()
 //        viewModel.getList()
         viewModel.getListPaging(1, perPage)
+        viewModel.getItemsRoom()
         clickReceiver()
         observe()
     }
@@ -75,16 +76,16 @@ class MainScreen : Fragment(R.layout.fragment_main) {
                 }
                 is CurrencyEvent.Success<*> -> {
                     binding.progressbar.isVisible = false
-
                     val list = it.data as ArrayList<GetItemResponse>
-                    val list2 = adapter.currentList.toMutableList()
-                    list2.addAll(list)
-                    adapter.submitList(list2)
-
+                    adapter.submitList(list)
+                    viewModel.insertAllRoom(list)
                 }
                 else -> {
                 }
             }
+        }
+        viewModel.getItemsRoom.observe(viewLifecycleOwner) {
+            Log.d("TTT", "hello" + it[1].name_uz)
         }
     }
 
