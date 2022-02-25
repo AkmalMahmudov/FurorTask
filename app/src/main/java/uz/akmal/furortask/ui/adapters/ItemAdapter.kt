@@ -11,15 +11,15 @@ import uz.akmal.furortask.model.data.response.GetItemResponse
 class ItemAdapter : ListAdapter<GetItemResponse, ItemAdapter.ViewHolder>(GetItemResponse.ITEM_CALLBACK) {
     private val ls = ArrayList<GetItemResponse>()
 
-    var itemClickListener: ((String) -> Unit)? = null
-    fun itemClickListener(block: (String) -> Unit) {
+    var itemClickListener: ((Int) -> Unit)? = null
+    fun itemClickListener(block: (Int) -> Unit) {
         itemClickListener = block
     }
 
     inner class ViewHolder(val binding: ItemRecyclerBinding) : RecyclerView.ViewHolder(binding.root) {
         init {
             itemView.setOnClickListener {
-                itemClickListener?.invoke(absoluteAdapterPosition.toString())
+                itemClickListener?.invoke(getItem(absoluteAdapterPosition).id)
             }
         }
     }

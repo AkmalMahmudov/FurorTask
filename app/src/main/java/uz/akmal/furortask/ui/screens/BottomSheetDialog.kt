@@ -10,6 +10,7 @@ import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import androidx.navigation.ui.navigateUp
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.snackbar.Snackbar
@@ -31,18 +32,17 @@ class BottomSheetDialog : BottomSheetDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setUpObServer()
         binding.c1.setOnClickListener {
             Toast.makeText(context, "${navArgs.itemNumber} edited", Toast.LENGTH_SHORT).show()
         }
         binding.c2.setOnClickListener {
             viewModel.deleteItem(navArgs.itemNumber)
-            Toast.makeText(context, "${navArgs.itemNumber} deleted", Toast.LENGTH_SHORT).show()
+//            Toast.makeText(context, "${navArgs.itemNumber} deleted", Toast.LENGTH_SHORT).show()
         }
     }
+    private fun setUpObServer(){
 
-    @SuppressLint("RestrictedApi")
-    override fun setupDialog(dialog: Dialog, style: Int) {
-        super.setupDialog(dialog, style)
         viewModel.deleteItem.observe(this) {
             when (it) {
                 is CurrencyEvent.Failure -> {
@@ -52,8 +52,10 @@ class BottomSheetDialog : BottomSheetDialogFragment() {
 
                 }
                 is CurrencyEvent.Success<*> -> {
-                    dialog.dismiss()
-                    Toast.makeText(context, "${it.data}", Toast.LENGTH_SHORT).show()
+                    dialog?.dismiss()
+
+                    Toast.makeText(context, "${navArgs.itemNumber}", Toast.LENGTH_SHORT).show()
+
                     findNavController().navigateUp()
                 }
                 else -> {
@@ -61,4 +63,5 @@ class BottomSheetDialog : BottomSheetDialogFragment() {
             }
         }
     }
+
 }

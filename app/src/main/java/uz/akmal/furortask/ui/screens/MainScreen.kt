@@ -53,7 +53,7 @@ class MainScreen : Fragment(R.layout.fragment_main) {
 
     private fun clickReceiver() {
         adapter.itemClickListener {
-            findNavController().navigate(MainScreenDirections.actionMainScreenToBottomSheetDialog(it.toInt()))
+            findNavController().navigate(MainScreenDirections.actionMainScreenToBottomSheetDialog(it))
         }
         binding.apply {
             more.setOnClickListener { }
