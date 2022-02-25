@@ -28,9 +28,7 @@ class BottomSheetDialog : BottomSheetDialogFragment() {
             Toast.makeText(context, "${navArgs.itemNumber} edited", Toast.LENGTH_SHORT).show()
         }
         binding.c2.setOnClickListener {
-            binding.c2.setOnClickListener {
                 Toast.makeText(context, "${navArgs.itemNumber} deleted", Toast.LENGTH_SHORT).show()
-            }
         }
     }
 }

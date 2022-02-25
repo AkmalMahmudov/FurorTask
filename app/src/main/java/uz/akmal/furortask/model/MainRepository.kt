@@ -31,4 +31,17 @@ class MainRepository @Inject constructor(private val api: ApiService) {
             CurrencyEvent.Failure(e.message ?: "error")
         }
     }
+    suspend fun getDeleteItem(id: Int): CurrencyEvent {
+        return try {
+            val response = api.deleteItem(id)
+            val result = response.body()
+            if (response.isSuccessful && result != null) {
+                CurrencyEvent.Success(result)
+            } else {
+                CurrencyEvent.Failure(response.message())
+            }
+        } catch (e: Exception) {
+            CurrencyEvent.Failure(e.message ?: "error")
+        }
+    }
 }
