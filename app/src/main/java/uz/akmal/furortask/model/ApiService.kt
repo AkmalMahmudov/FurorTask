@@ -17,7 +17,7 @@ interface ApiService {
     @PUT("api/product")
     suspend fun updateItem(): Response<List<GetItemResponse>>
 
-    @HTTP(method = "DELETE", path = "api/product", hasBody = true)
-    suspend fun deleteItem(@Body id:Int): Response<List<String>>
+   @DELETE("api/product/{id}")
+    suspend fun deleteItem(@Path("id") id:Int): Response<String>
 
 }

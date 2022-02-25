@@ -14,8 +14,10 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(private val repository: MainRepository) : ViewModel() {
-    private var _getPageList = MutableLiveData<CurrencyEvent>()
-    val getPaeList: LiveData<CurrencyEvent> get() = _getPageList
+    private var _getPageList = MutableLiveData<CurrencyEvent?>()
+    val getPaeList: LiveData<CurrencyEvent?> get() = _getPageList
+    private var _deleteItem = MutableLiveData<CurrencyEvent?>()
+    val deleteItem: LiveData<CurrencyEvent?> get() = _deleteItem
 
     fun getListPaging(page: Int, perPage: Int) {
         CoroutineScope(Dispatchers.IO).launch {
@@ -25,7 +27,21 @@ class MainViewModel @Inject constructor(private val repository: MainRepository) 
             }
         }
     }
- fun navigate(){
-     _getPageList.value=null
- }
+
+    fun deleteItem(id: Int) {
+        CoroutineScope(Dispatchers.IO).launch {
+            _deleteItem.postValue(CurrencyEvent.Loading)
+            viewModelScope.launch {
+                _deleteItem.value = repository.getDeleteItem(id)
+            }
+        }
+    }
+
+    fun navigate() {
+        _getPageList.value = null
+    }
+
+    fun navigateDelete() {
+        _deleteItem.value = null
+    }
 }

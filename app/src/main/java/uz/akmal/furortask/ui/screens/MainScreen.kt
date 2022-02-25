@@ -86,7 +86,6 @@ class MainScreen : Fragment(R.layout.fragment_main) {
                 }
             }
         }
-            viewModel.navigate()
     }
 
     private fun openDialog() {
