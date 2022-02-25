@@ -42,9 +42,12 @@ class ItemAdapter : RecyclerView.Adapter<ItemAdapter.ViewHolder>() {
     override fun getItemCount() = ls.size
 
     fun submitList(data: List<GetItemResponse>) {
-        ls.clear()
+       ls.clear()
         ls.addAll(data)
-        notifyItemRangeRemoved(0, data.size)
+        notifyDataSetChanged()
+    }
+    fun currentList():ArrayList<GetItemResponse>{
+        return ls
     }
 
     fun removeItem(data: GetItemResponse) {
