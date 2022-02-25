@@ -3,13 +3,14 @@ package uz.akmal.furortask.ui.screens
 import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
@@ -29,28 +30,31 @@ class MainScreen : Fragment(R.layout.fragment_main) {
     var name = ""
     var address = ""
     var cost = 0
+    private val perPage = 5
+    private var currentPage = 1
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         loadViews()
-        viewModel.getList()
+//        viewModel.getList()
+        viewModel.getListPaging(currentPage++, perPage)
         clickReceiver()
         observe()
     }
 
     private fun loadViews() {
-        binding.swipeRefresh.setOnRefreshListener {
-            binding.swipeRefresh.isRefreshing = false
-        }
+
         adapter = ItemAdapter()
-        binding.recycler.layoutManager = LinearLayoutManager(requireActivity(), LinearLayoutManager.VERTICAL, false)
+        binding.recycler.layoutManager =
+            LinearLayoutManager(requireActivity(), LinearLayoutManager.VERTICAL, false)
         binding.recycler.adapter = adapter
+        binding.recycler.addOnScrollListener(scrollListener)
     }
 
     private fun clickReceiver() {
-        adapter.itemClickListener {
-            findNavController().navigate(MainScreenDirections.actionMainScreenToBottomSheetDialog(it.toInt()))
-        }
+//        adapter.itemClickListener {
+//            findNavController().navigate(MainScreenDirections.actionMainScreenToBottomSheetDialog(it.toInt()))
+//        }
         binding.apply {
             more.setOnClickListener { }
             search.setOnClickListener { }
@@ -81,6 +85,27 @@ class MainScreen : Fragment(R.layout.fragment_main) {
                 }
             }
         }
+        viewModel.getPaeList.observe(viewLifecycleOwner) {
+            when (it) {
+                is CurrencyEvent.Failure -> {
+                    Snackbar.make(binding.root, it.errorText, Snackbar.LENGTH_SHORT).show()
+                }
+                is CurrencyEvent.Loading -> {
+                    binding.progressbar.isVisible = true
+                }
+                is CurrencyEvent.Success<*> -> {
+                    binding.progressbar.isVisible = false
+
+                    val list = it.data as ArrayList<GetItemResponse>
+                    val list2 = adapter.currentList()
+                    list.addAll(list2)
+                    adapter.submitList(list)
+
+                }
+                else -> {
+                }
+            }
+        }
     }
 
     @SuppressLint("InflateParams")
@@ -103,5 +128,24 @@ class MainScreen : Fragment(R.layout.fragment_main) {
             show()
         }
 
+    }
+
+    private val scrollListener = object : RecyclerView.OnScrollListener() {
+
+        override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+            super.onScrolled(recyclerView, dx, dy)
+
+            val layoutManager = recyclerView.layoutManager as LinearLayoutManager
+            if (currentPage == 1 && dy <= 0) {
+                viewModel.getListPaging(currentPage, perPage)
+                currentPage++
+            } else {
+                if (layoutManager.findLastVisibleItemPosition() >= currentPage * perPage - 1) {
+                    viewModel.getListPaging(currentPage, perPage)
+                    currentPage++
+                    Log.d("mkm", "onScrolled: $currentPage ")
+                }
+            }
+        }
     }
 }
