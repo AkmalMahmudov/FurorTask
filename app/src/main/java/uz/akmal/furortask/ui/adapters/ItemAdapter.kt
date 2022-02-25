@@ -18,7 +18,7 @@ class ItemAdapter : ListAdapter<GetItemResponse, ItemAdapter.ViewHolder>(GetItem
 
     inner class ViewHolder(val binding: ItemRecyclerBinding) : RecyclerView.ViewHolder(binding.root) {
         init {
-            itemView.setOnClickListener {
+            binding.item.setOnClickListener {
                 itemClickListener?.invoke(getItem(absoluteAdapterPosition).id)
             }
         }

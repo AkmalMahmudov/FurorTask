@@ -1,7 +1,5 @@
 package uz.akmal.furortask.ui.screens
 
-import android.annotation.SuppressLint
-import android.app.Dialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -10,7 +8,6 @@ import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import androidx.navigation.ui.navigateUp
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.snackbar.Snackbar
@@ -25,6 +22,7 @@ class BottomSheetDialog : BottomSheetDialogFragment() {
     private val binding by viewBinding(DialogBottomBinding::bind)
     private val navArgs: BottomSheetDialogArgs by navArgs()
     private val viewModel: MainViewModel by viewModels()
+
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.dialog_bottom, container, false)
@@ -44,6 +42,7 @@ class BottomSheetDialog : BottomSheetDialogFragment() {
     private fun setUpObServer(){
 
         viewModel.deleteItem.observe(this) {
+            if(it!=null){
             when (it) {
                 is CurrencyEvent.Failure -> {
                     Snackbar.make(binding.root, it.errorText, Snackbar.LENGTH_SHORT).show()
@@ -52,16 +51,23 @@ class BottomSheetDialog : BottomSheetDialogFragment() {
 
                 }
                 is CurrencyEvent.Success<*> -> {
+                    findNavController().navigate(BottomSheetDialogDirections.actionBottomSheetDialogToMainScreen())
                     dialog?.dismiss()
 
                     Toast.makeText(context, "${navArgs.itemNumber}", Toast.LENGTH_SHORT).show()
 
-                    findNavController().navigateUp()
                 }
                 else -> {
                 }
             }
+            viewModel.navigateDelete()
+
+            }
         }
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        viewModel.navigateDelete()
+    }
 }

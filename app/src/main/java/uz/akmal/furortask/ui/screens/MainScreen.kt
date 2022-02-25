@@ -66,6 +66,7 @@ class MainScreen : Fragment(R.layout.fragment_main) {
 
     private fun observe() {
         viewModel.getPaeList.observe(viewLifecycleOwner) {
+            if(it!=null){
             when (it) {
                 is CurrencyEvent.Failure -> {
                     Snackbar.make(binding.root, it.errorText, Snackbar.LENGTH_SHORT).show()
@@ -85,6 +86,8 @@ class MainScreen : Fragment(R.layout.fragment_main) {
                 else -> {
                 }
             }
+            viewModel.navigate()
+            }
         }
     }
 
@@ -92,7 +95,7 @@ class MainScreen : Fragment(R.layout.fragment_main) {
         var named = ""
         var addressed = ""
         var costed = 0F
-//kkkk
+
         val binding = ItemDialogBinding.inflate(LayoutInflater.from(context), null, false)
         val alertDialog = Dialog(requireContext())
         alertDialog.apply {
@@ -151,5 +154,10 @@ class MainScreen : Fragment(R.layout.fragment_main) {
                 }
             }
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        viewModel.navigate()
     }
 }
