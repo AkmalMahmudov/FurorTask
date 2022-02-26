@@ -51,9 +51,9 @@ class MainScreen : Fragment(R.layout.fragment_main) {
         viewModel.getItemsRoom()
         clickReceiver()
         observe()
-        addDialog()
+//        addDialog()
     }
-    private fun addDialog(){
+    private fun addDialog(it:GetItemResponse){
         dialog = BottomSheetDialog()
         dialog!!.setTargetFragment(this, 1)
         dialog!!.itemClickListener {item->
@@ -68,6 +68,8 @@ class MainScreen : Fragment(R.layout.fragment_main) {
             list.add(index,newItem)
             adapter.submitList(list)
         }
+        dialog?.item=it
+        dialog?.show(parentFragmentManager, dialog?.tag)
     }
 
     private fun loadViews() {
@@ -81,11 +83,12 @@ class MainScreen : Fragment(R.layout.fragment_main) {
     @RequiresApi(Build.VERSION_CODES.O)
     private fun clickReceiver() {
         adapter.itemClickListener {
-            if (navController.currentDestination?.id == R.id.mainScreen) {
-                dialog?.item=it
-                dialog?.show(parentFragmentManager, dialog?.tag)
+//            if (navController.currentDestination?.id == R.id.mainScreen) {
+//                dialog?.item=it
+//                dialog?.show(parentFragmentManager, dialog?.tag)
+            addDialog(it)
 //                navController.navigate(MainScreenDirections.actionMainScreenToBottomSheetDialog(it))
-            }
+
         }
         binding.apply {
             fab.setOnClickListener {

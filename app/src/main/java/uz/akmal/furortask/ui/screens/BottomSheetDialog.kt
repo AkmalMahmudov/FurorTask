@@ -55,6 +55,7 @@ class BottomSheetDialog : BottomSheetDialogFragment() {
         }
     }
 
+
     private fun setUpObServer() {
         viewModel.deleteItem.observe(this) {
             if (it != null) {
@@ -73,7 +74,7 @@ class BottomSheetDialog : BottomSheetDialogFragment() {
                     else -> {
                     }
                 }
-                viewModel.navigateDelete()
+//                viewModel.navigateDelete()
             }
         }
         viewModel.updateItem.observe(this) {
@@ -93,7 +94,7 @@ class BottomSheetDialog : BottomSheetDialogFragment() {
                     else -> {
                     }
                 }
-                viewModel.navigateUpdate()
+//                viewModel.navigateUpdate()
             }
         }
     }
@@ -140,8 +141,8 @@ class BottomSheetDialog : BottomSheetDialogFragment() {
                 if (!inputName.text.isNullOrEmpty() && !inputAddress.text.isNullOrEmpty() && !inputCost.text.isNullOrEmpty()) {
                     val date = getCurrentDateTime()
                     val dateInString = date.toString("yyyy-MM-dd'T'HH:mm:ss'Z'")
-                    newItem= GetItemResponse(id,addressed,costed.toDouble(), date.time,named,1)
-                    viewModel.updateItem(addressed, costed.toInt(), dateInString, id, named, 1)
+                    newItem= GetItemResponse(item.id,addressed,costed.toDouble(), date.time,named,1)
+                    viewModel.updateItem(addressed, costed.toInt(), dateInString, item.id, named, 1)
 
                     alertDialog.dismiss()
                 }
@@ -163,5 +164,6 @@ class BottomSheetDialog : BottomSheetDialogFragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         viewModel.navigateDelete()
+        viewModel.navigateUpdate()
     }
 }
