@@ -94,8 +94,10 @@ class MainScreen : Fragment(R.layout.fragment_main) {
                     is CurrencyEvent.Success<*> -> {
                         binding.progressbar.isVisible = false
                         val list = it.data as ArrayList<GetItemResponse>
-                        adapter.submitList(list)
-                        viewModel.deleteAllRoom()
+                      val  list2=adapter.currentList.toMutableList()
+                        list2.addAll(list)
+                        adapter.submitList(list2)
+//                        viewModel.deleteAllRoom()
                         viewModel.insertAllRoom(list)
                     }
                     else -> {
