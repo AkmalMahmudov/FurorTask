@@ -66,8 +66,8 @@ class MainScreen : Fragment(R.layout.fragment_main) {
             }
         }
         binding.apply {
-            more.setOnClickListener { }
-            search.setOnClickListener { }
+//            more.setOnClickListener { }
+//            search.setOnClickListener { }
             fab.setOnClickListener {
                 openDialog()
             }

@@ -119,4 +119,7 @@ class MainRepository @Inject constructor(private val api: ApiService, private va
     fun deleteAllRoom() {
         dao.deleteAll()
     }
+    fun search(name:String):List<GetItemResponse>{
+        return dao.search(name)
+    }
 }

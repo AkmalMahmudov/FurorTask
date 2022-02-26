@@ -28,6 +28,8 @@ class MainViewModel @Inject constructor(private val repository: MainRepository) 
 
     private var _deleteItem = MutableLiveData<CurrencyEvent?>()
     val deleteItem: LiveData<CurrencyEvent?> get() = _deleteItem
+    private var _search = MutableLiveData<List<GetItemResponse>>()
+    val search: LiveData<List<GetItemResponse>> get() = _search
 
     private var _getItemsRoom = MutableLiveData<List<GetItemResponse>>()
     val getItemsRoom: LiveData<List<GetItemResponse>> get() = _getItemsRoom
@@ -66,6 +68,11 @@ class MainViewModel @Inject constructor(private val repository: MainRepository) 
             viewModelScope.launch {
                 _deleteItem.value = repository.getDeleteItem(id)
             }
+        }
+    }
+    fun search(name: String) {
+        CoroutineScope(Dispatchers.IO).launch {
+                _search.value = repository.search(name)
         }
     }
 
