@@ -52,7 +52,7 @@ class MainScreen : Fragment(R.layout.fragment_main) {
         checkInternet()
         loadViews()
         viewModel.getListPaging(1, perPage)
-        viewModel.getItemsRoom()
+//        viewModel.getItemsRoom()
         clickReceiver()
         observe()
 //        addDialog()
@@ -98,8 +98,12 @@ class MainScreen : Fragment(R.layout.fragment_main) {
         binding.apply {
             refresh.setOnClickListener {
                 if (internet == "yes") {
-                    viewModel.getListPaging(1, perPage)
+                    currentPage=1
+//                    loadViews()
                     adapter.submitList(emptyList())
+                    viewModel.getListPaging(currentPage, perPage)
+
+//                    binding.recycler.addOnScrollListener(scrollListener)
                 }
             }
             fab.setOnClickListener {
@@ -119,6 +123,7 @@ class MainScreen : Fragment(R.layout.fragment_main) {
                         internetDialog()
                         binding.progressbar.isVisible = false
                         binding.mode.visibility = View.VISIBLE
+                        viewModel.getItemsRoom()
                         Snackbar.make(binding.root, it.errorText, Snackbar.LENGTH_SHORT).show()
                     }
                     is CurrencyEvent.Loading -> {
@@ -231,8 +236,8 @@ class MainScreen : Fragment(R.layout.fragment_main) {
             super.onScrolled(recyclerView, dx, dy)
 
             val layoutManager = recyclerView.layoutManager as LinearLayoutManager
-            if (currentPage++ == 1 && dy <= 0) {
-                viewModel.getListPaging(currentPage, perPage)
+            if (currentPage == 1 && dy <= 0) {
+                viewModel.getListPaging(1, perPage)
                 binding.fab.show()
 //                currentPage++
             } else {
