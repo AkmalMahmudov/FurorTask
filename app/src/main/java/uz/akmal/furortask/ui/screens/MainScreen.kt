@@ -33,6 +33,7 @@ import uz.akmal.furortask.util.EventBus
 import uz.akmal.furortask.viewModel.MainViewModel
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.properties.Delegates
 
 @AndroidEntryPoint
 class MainScreen : Fragment(R.layout.fragment_main) {
@@ -98,6 +99,7 @@ class MainScreen : Fragment(R.layout.fragment_main) {
             refresh.setOnClickListener {
                 if (internet == "yes") {
                     viewModel.getListPaging(1, perPage)
+                    adapter.submitList(emptyList())
                 }
             }
             fab.setOnClickListener {
