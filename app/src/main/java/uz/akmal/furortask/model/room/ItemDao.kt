@@ -20,6 +20,9 @@ interface ItemDao {
     @Delete
     fun delete(item: GetItemResponse)
 
+    @Query("DELETE FROM items_table")
+    fun deleteAll()
+
     @Query("SELECT * FROM items_table WHERE name_uz LIKE :searchQuery")
     fun search(searchQuery: String): List<GetItemResponse>
 }

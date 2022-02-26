@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -15,13 +16,19 @@ import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import uz.akmal.furortask.R
 import uz.akmal.furortask.databinding.FragmentMainBinding
 import uz.akmal.furortask.databinding.ItemDialogBinding
 import uz.akmal.furortask.model.data.response.GetItemResponse
 import uz.akmal.furortask.ui.adapters.ItemAdapter
 import uz.akmal.furortask.util.CurrencyEvent
+import uz.akmal.furortask.util.EventBus
 import uz.akmal.furortask.viewModel.MainViewModel
+import java.util.*
 
 @AndroidEntryPoint
 class MainScreen : Fragment(R.layout.fragment_main) {
@@ -30,11 +37,11 @@ class MainScreen : Fragment(R.layout.fragment_main) {
     lateinit var adapter: ItemAdapter
     private val perPage = 5
     private var currentPage = 1
+    private val navController by lazy { findNavController() }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         loadViews()
-//        viewModel.getList()
         viewModel.getListPaging(1, perPage)
         viewModel.getItemsRoom()
         clickReceiver()
@@ -43,18 +50,20 @@ class MainScreen : Fragment(R.layout.fragment_main) {
 
     private fun loadViews() {
         binding.swipeRefresh.setOnRefreshListener {
+            checkInternet()
             binding.swipeRefresh.isRefreshing = false
         }
         adapter = ItemAdapter()
-        binding.recycler.layoutManager =
-            LinearLayoutManager(requireActivity(), LinearLayoutManager.VERTICAL, false)
+        binding.recycler.layoutManager = LinearLayoutManager(requireActivity(), LinearLayoutManager.VERTICAL, false)
         binding.recycler.adapter = adapter
         binding.recycler.addOnScrollListener(scrollListener)
     }
 
     private fun clickReceiver() {
         adapter.itemClickListener {
-            findNavController().navigate(MainScreenDirections.actionMainScreenToBottomSheetDialog(it))
+            if (navController.currentDestination?.id == R.id.mainScreen) {
+                navController.navigate(MainScreenDirections.actionMainScreenToBottomSheetDialog(it))
+            }
         }
         binding.apply {
             more.setOnClickListener { }
@@ -67,28 +76,46 @@ class MainScreen : Fragment(R.layout.fragment_main) {
 
     private fun observe() {
         viewModel.getPaeList.observe(viewLifecycleOwner) {
-            if(it!=null){
-            when (it) {
-                is CurrencyEvent.Failure -> {
-                    Snackbar.make(binding.root, it.errorText, Snackbar.LENGTH_SHORT).show()
+            if (it != null) {
+                when (it) {
+                    is CurrencyEvent.Failure -> {
+                        Snackbar.make(binding.root, it.errorText, Snackbar.LENGTH_SHORT).show()
+                    }
+                    is CurrencyEvent.Loading -> {
+                        binding.progressbar.isVisible = true
+                    }
+                    is CurrencyEvent.Success<*> -> {
+                        binding.progressbar.isVisible = false
+                        val list = it.data as ArrayList<GetItemResponse>
+                        adapter.submitList(list)
+                        viewModel.deleteAllRoom()
+                        viewModel.insertAllRoom(list)
+                    }
+                    else -> {
+                    }
                 }
-                is CurrencyEvent.Loading -> {
-                    binding.progressbar.isVisible = true
-                }
-                is CurrencyEvent.Success<*> -> {
-                    binding.progressbar.isVisible = false
-                    val list = it.data as ArrayList<GetItemResponse>
-                    adapter.submitList(list)
-                    viewModel.insertAllRoom(list)
-                }
-                else -> {
-                }
-            }
-            viewModel.navigate()
+                viewModel.navigate()
             }
         }
+        viewModel.insertItem.observe(viewLifecycleOwner) {
+            if (it != null) {
+                when (it) {
+                    is CurrencyEvent.Failure -> {
+                        Snackbar.make(binding.root, it.errorText, Snackbar.LENGTH_SHORT).show()
+                    }
+                    is CurrencyEvent.Loading -> {
+                    }
+                    is CurrencyEvent.Success<*> -> {
+                        Toast.makeText(context, "item successfully added", Toast.LENGTH_SHORT).show()
+                    }
+                    else -> {
+                    }
+                }
+            }
+        }
+
         viewModel.getItemsRoom.observe(viewLifecycleOwner) {
-            Log.d("TTT", "$it")
+            adapter.submitList(it)
         }
     }
 
@@ -129,6 +156,8 @@ class MainScreen : Fragment(R.layout.fragment_main) {
                 }
 
                 if (!inputName.text.isNullOrEmpty() && !inputAddress.text.isNullOrEmpty() && !inputCost.text.isNullOrEmpty()) {
+                    val date = Calendar.getInstance().time
+                    viewModel.insertItem(addressed, costed.toInt(), date.toString(), named, 1)
                     alertDialog.dismiss()
                 }
             }
@@ -155,6 +184,23 @@ class MainScreen : Fragment(R.layout.fragment_main) {
                 }
             }
         }
+    }
+
+    private fun checkInternet() {
+        CoroutineScope(Dispatchers.Main).launch {
+            EventBus.internet.collectLatest {
+                if (!it) {
+                    viewModel.getItemsRoom()
+                    binding.mode.visibility = View.VISIBLE
+                    Toast.makeText(context, "room", Toast.LENGTH_SHORT).show()
+                } else {
+                    viewModel.getListPaging(1, perPage)
+                    binding.mode.visibility = View.GONE
+                    Toast.makeText(context, "retrofit", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+
     }
 
     override fun onDestroyView() {
