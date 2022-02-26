@@ -41,9 +41,11 @@ class MainScreen : Fragment(R.layout.fragment_main) {
     private lateinit var adapter: ItemAdapter
     private val perPage = 5
     private var dialog: BottomSheetDialog? = null
+    val splash = SplashFragment()
     private var currentPage = 1
     private val navController by lazy { findNavController() }
     var connection: Boolean? = null
+    private var internet: String = ""
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -85,21 +87,19 @@ class MainScreen : Fragment(R.layout.fragment_main) {
         binding.recycler.addOnScrollListener(scrollListener)
     }
 
-
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun clickReceiver() {
-        if (connection == false) {
-            adapter.itemClickListener {
+        Toast.makeText(context, "bool $connection", Toast.LENGTH_SHORT).show()
+        adapter.itemClickListener {
 //            if (navController.currentDestination?.id == R.id.mainScreen) {
 //                dialog?.item=it
 //                dialog?.show(parentFragmentManager, dialog?.tag)
-                addDialog(it)
+            addDialog(it)
 //                navController.navigate(MainScreenDirections.actionMainScreenToBottomSheetDialog(it))
-
-            }
-            binding.apply {
-                fab.setOnClickListener {
-                    openDialog()
-                }
+        }
+        binding.apply {
+            fab.setOnClickListener {
+                openDialog()
             }
         }
     }
@@ -249,6 +249,7 @@ class MainScreen : Fragment(R.layout.fragment_main) {
                     binding.mode.visibility = View.VISIBLE
                     connection = false
                     Toast.makeText(context, "room  $connection", Toast.LENGTH_SHORT).show()
+
                 } else {
                     binding.mode.visibility = View.GONE
                     connection = true
