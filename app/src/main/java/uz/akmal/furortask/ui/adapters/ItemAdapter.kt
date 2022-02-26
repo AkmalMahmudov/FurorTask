@@ -36,7 +36,7 @@ class ItemAdapter : ListAdapter<GetItemResponse, ItemAdapter.ViewHolder>(GetItem
             address.text = getItem(position).address
             id.text = getItem(position).id.toString()
             price.text = " ${getItem(position).cost}$"
-            date.text = "0"
+            date.text = getItem(position).created_date.toString()
         }
     }
 
