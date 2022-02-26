@@ -59,7 +59,6 @@ class MainViewModel @Inject constructor(private val repository: MainRepository) 
                 _updateItem.value = repository.updateItem(UpdateItemRequest(address, cost, created_date, id, name_uz, product_type_id))
             }
         }
-
     }
 
     fun deleteItem(id: Int) {
@@ -84,9 +83,9 @@ class MainViewModel @Inject constructor(private val repository: MainRepository) 
         _deleteItem.value = null
     }
 
-    fun navigateUpdate() {
+  /*  fun navigateUpdate() {
         _updateItem.value = null
-    }
+    }*/
 
     fun insertAllRoom(list: List<GetItemResponse>) {
         CoroutineScope(Dispatchers.IO).launch {

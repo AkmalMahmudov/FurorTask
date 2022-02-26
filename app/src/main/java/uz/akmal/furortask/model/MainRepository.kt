@@ -49,10 +49,10 @@ class MainRepository @Inject constructor(private val api: ApiService, private va
             }
 
         })
-        return event ?: CurrencyEvent.Loading
+        return event ?: CurrencyEvent.Success(1)
     }
 
-    suspend fun insertItem(data: InsertItemRequest): CurrencyEvent {
+    fun insertItem(data: InsertItemRequest): CurrencyEvent {
         var event: CurrencyEvent? = null
         api.insertItem(data).enqueue(object : Callback<Any> {
             override fun onFailure(call: Call<Any>, t: Throwable) {
@@ -74,7 +74,7 @@ class MainRepository @Inject constructor(private val api: ApiService, private va
         return event ?: CurrencyEvent.Success(1)
     }
 
-    suspend fun updateItem(data: UpdateItemRequest): CurrencyEvent {
+    fun updateItem(data: UpdateItemRequest): CurrencyEvent {
         var event: CurrencyEvent? = null
         api.updateItem(data).enqueue(object : Callback<Any> {
             override fun onFailure(call: Call<Any>, t: Throwable) {
@@ -91,7 +91,6 @@ class MainRepository @Inject constructor(private val api: ApiService, private va
                     Log.d("ttt", "onResponse: else")
                 }
             }
-
         })
         return event ?: CurrencyEvent.Success(1)
     }
@@ -119,7 +118,8 @@ class MainRepository @Inject constructor(private val api: ApiService, private va
     fun deleteAllRoom() {
         dao.deleteAll()
     }
-    fun search(name:String):List<GetItemResponse>{
+
+    fun search(name: String): List<GetItemResponse> {
         return dao.search(name)
     }
 }

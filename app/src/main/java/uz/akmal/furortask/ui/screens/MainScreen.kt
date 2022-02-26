@@ -31,15 +31,13 @@ import uz.akmal.furortask.util.CurrencyEvent
 import uz.akmal.furortask.util.EventBus
 import uz.akmal.furortask.viewModel.MainViewModel
 import java.text.SimpleDateFormat
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 import java.util.*
 
 @AndroidEntryPoint
 class MainScreen : Fragment(R.layout.fragment_main) {
     private val binding by viewBinding(FragmentMainBinding::bind)
     private val viewModel: MainViewModel by viewModels()
-    lateinit var adapter: ItemAdapter
+    private lateinit var adapter: ItemAdapter
     private val perPage = 5
     private var currentPage = 1
     private val navController by lazy { findNavController() }
@@ -55,10 +53,6 @@ class MainScreen : Fragment(R.layout.fragment_main) {
     }
 
     private fun loadViews() {
-        binding.swipeRefresh.setOnRefreshListener {
-            checkInternet()
-            binding.swipeRefresh.isRefreshing = false
-        }
         adapter = ItemAdapter()
         binding.recycler.layoutManager = LinearLayoutManager(requireActivity(), LinearLayoutManager.VERTICAL, false)
         binding.recycler.adapter = adapter
@@ -73,8 +67,6 @@ class MainScreen : Fragment(R.layout.fragment_main) {
             }
         }
         binding.apply {
-//            more.setOnClickListener { }
-//            search.setOnClickListener { }
             fab.setOnClickListener {
                 openDialog()
             }
@@ -94,7 +86,7 @@ class MainScreen : Fragment(R.layout.fragment_main) {
                     is CurrencyEvent.Success<*> -> {
                         binding.progressbar.isVisible = false
                         val list = it.data as ArrayList<GetItemResponse>
-                      val  list2=adapter.currentList.toMutableList()
+                        val list2 = adapter.currentList.toMutableList()
                         list2.addAll(list)
                         adapter.submitList(list2)
 //                        viewModel.deleteAllRoom()
@@ -166,9 +158,8 @@ class MainScreen : Fragment(R.layout.fragment_main) {
                 }
 
                 if (!inputName.text.isNullOrEmpty() && !inputAddress.text.isNullOrEmpty() && !inputCost.text.isNullOrEmpty()) {
-                   val date = getCurrentDateTime()
+                    val date = getCurrentDateTime()
                     val dateInString = date.toString("yyyy-MM-dd'T'HH:mm:ss'Z'")
-
                     viewModel.insertItem(addressed, costed.toInt(), dateInString, named, 1)
                     alertDialog.dismiss()
                 }
@@ -178,14 +169,16 @@ class MainScreen : Fragment(R.layout.fragment_main) {
             }
         }
     }
-    fun Date.toString(format: String, locale: Locale = Locale.getDefault()): String {
+
+    private fun Date.toString(format: String, locale: Locale = Locale.getDefault()): String {
         val formatter = SimpleDateFormat(format, locale)
         return formatter.format(this)
     }
 
-    fun getCurrentDateTime(): Date {
+    private fun getCurrentDateTime(): Date {
         return Calendar.getInstance().time
     }
+
     private val scrollListener = object : RecyclerView.OnScrollListener() {
 
         override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
@@ -209,11 +202,9 @@ class MainScreen : Fragment(R.layout.fragment_main) {
         CoroutineScope(Dispatchers.Main).launch {
             EventBus.internet.collectLatest {
                 if (!it) {
-                    viewModel.getItemsRoom()
                     binding.mode.visibility = View.VISIBLE
                     Toast.makeText(context, "room", Toast.LENGTH_SHORT).show()
                 } else {
-                    viewModel.getListPaging(1, perPage)
                     binding.mode.visibility = View.GONE
                     Toast.makeText(context, "retrofit", Toast.LENGTH_SHORT).show()
                 }

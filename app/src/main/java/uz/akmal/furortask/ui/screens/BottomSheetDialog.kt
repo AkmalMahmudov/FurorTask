@@ -17,6 +17,7 @@ import uz.akmal.furortask.databinding.DialogBottomBinding
 import uz.akmal.furortask.databinding.ItemDialogBinding
 import uz.akmal.furortask.util.CurrencyEvent
 import uz.akmal.furortask.viewModel.MainViewModel
+import java.text.SimpleDateFormat
 import java.util.*
 
 @AndroidEntryPoint
@@ -24,7 +25,6 @@ class BottomSheetDialog : BottomSheetDialogFragment() {
     private val binding by viewBinding(DialogBottomBinding::bind)
     private val navArgs: BottomSheetDialogArgs by navArgs()
     private val viewModel: MainViewModel by viewModels()
-
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.dialog_bottom, container, false)
@@ -60,7 +60,7 @@ class BottomSheetDialog : BottomSheetDialogFragment() {
                 viewModel.navigateDelete()
             }
         }
-        viewModel.updateItem.observe(viewLifecycleOwner) {
+        viewModel.updateItem.observe(this) {
             if (it != null) {
                 when (it) {
                     is CurrencyEvent.Failure -> {
@@ -75,7 +75,7 @@ class BottomSheetDialog : BottomSheetDialogFragment() {
                     else -> {
                     }
                 }
-                viewModel.navigateUpdate()
+//                viewModel.navigateUpdate()
             }
         }
     }
@@ -117,15 +117,24 @@ class BottomSheetDialog : BottomSheetDialogFragment() {
                 }
 
                 if (!inputName.text.isNullOrEmpty() && !inputAddress.text.isNullOrEmpty() && !inputCost.text.isNullOrEmpty()) {
-                    val date = Calendar.getInstance().time
-                    viewModel.updateItem(addressed, costed.toInt(), date.toString(), id, named, 1)
-                    alertDialog.dismiss()
+                    val date = getCurrentDateTime()
+                    val dateInString = date.toString("yyyy-MM-dd'T'HH:mm:ss'Z'")
+                    viewModel.updateItem(addressed, costed.toInt(), dateInString, 1, named, id)
                 }
             }
             cancel.setOnClickListener {
                 alertDialog.cancel()
             }
         }
+    }
+
+    private fun Date.toString(format: String, locale: Locale = Locale.getDefault()): String {
+        val formatter = SimpleDateFormat(format, locale)
+        return formatter.format(this)
+    }
+
+    private fun getCurrentDateTime(): Date {
+        return Calendar.getInstance().time
     }
 
     override fun onDestroyView() {
