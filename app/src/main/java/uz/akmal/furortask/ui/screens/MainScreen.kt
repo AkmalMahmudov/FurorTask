@@ -1,5 +1,6 @@
 package uz.akmal.furortask.ui.screens
 
+import android.app.AlertDialog
 import android.app.Dialog
 import android.os.Build
 import android.os.Bundle
@@ -32,6 +33,7 @@ import uz.akmal.furortask.util.EventBus
 import uz.akmal.furortask.viewModel.MainViewModel
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.properties.Delegates
 
 @AndroidEntryPoint
 class MainScreen : Fragment(R.layout.fragment_main) {
@@ -39,13 +41,15 @@ class MainScreen : Fragment(R.layout.fragment_main) {
     private val viewModel: MainViewModel by viewModels()
     private lateinit var adapter: ItemAdapter
     private val perPage = 5
-    private var dialog:BottomSheetDialog?=null
+    private var dialog: BottomSheetDialog? = null
     private var currentPage = 1
     private val navController by lazy { findNavController() }
+    var connection: Boolean = false
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        checkInternet()
         loadViews()
         viewModel.getListPaging(1, perPage)
         viewModel.getItemsRoom()
@@ -53,22 +57,23 @@ class MainScreen : Fragment(R.layout.fragment_main) {
         observe()
 //        addDialog()
     }
-    private fun addDialog(it:GetItemResponse){
+
+    private fun addDialog(it: GetItemResponse) {
         dialog = BottomSheetDialog()
         dialog!!.setTargetFragment(this, 1)
-        dialog!!.itemClickListener {item->
+        dialog!!.itemClickListener { item ->
             val list = adapter.currentList.toMutableList()
             list.remove(item)
             adapter.submitList(list)
         }
-        dialog!!.itemEdit {oldItem, newItem->
+        dialog!!.itemEdit { oldItem, newItem ->
             val list = adapter.currentList.toMutableList()
-            val index=list.indexOf(oldItem)
+            val index = list.indexOf(oldItem)
             list.remove(oldItem)
-            list.add(index,newItem)
+            list.add(index, newItem)
             adapter.submitList(list)
         }
-        dialog?.item=it
+        dialog?.item = it
         dialog?.show(parentFragmentManager, dialog?.tag)
     }
 
@@ -82,18 +87,22 @@ class MainScreen : Fragment(R.layout.fragment_main) {
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun clickReceiver() {
-        adapter.itemClickListener {
+        if (connection) {
+            adapter.itemClickListener {
 //            if (navController.currentDestination?.id == R.id.mainScreen) {
 //                dialog?.item=it
 //                dialog?.show(parentFragmentManager, dialog?.tag)
-            addDialog(it)
+                addDialog(it)
 //                navController.navigate(MainScreenDirections.actionMainScreenToBottomSheetDialog(it))
 
-        }
-        binding.apply {
-            fab.setOnClickListener {
-                openDialog()
             }
+            binding.apply {
+                fab.setOnClickListener {
+                    openDialog()
+                }
+            }
+        } else {
+            internetDialog()
         }
     }
 
@@ -102,6 +111,10 @@ class MainScreen : Fragment(R.layout.fragment_main) {
             if (it != null) {
                 when (it) {
                     is CurrencyEvent.Failure -> {
+                        connection = false
+                        internetDialog()
+                        binding.progressbar.isVisible = false
+
                         Snackbar.make(binding.root, it.errorText, Snackbar.LENGTH_SHORT).show()
                     }
                     is CurrencyEvent.Loading -> {
@@ -232,13 +245,23 @@ class MainScreen : Fragment(R.layout.fragment_main) {
                 if (!it) {
                     binding.mode.visibility = View.VISIBLE
                     Toast.makeText(context, "room", Toast.LENGTH_SHORT).show()
+                    connection = false
                 } else {
                     binding.mode.visibility = View.GONE
                     Toast.makeText(context, "retrofit", Toast.LENGTH_SHORT).show()
+                    connection = true
                 }
             }
         }
+    }
 
+    private fun internetDialog() {
+        AlertDialog.Builder(context)
+            .setTitle("Connection lost\n to make changes go online")
+            .setIcon(R.drawable.ic_no_internet)
+            .setPositiveButton("OK") { _, _ -> }
+            .setCancelable(false)
+            .create().show()
     }
 
     override fun onDestroyView() {
