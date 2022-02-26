@@ -16,10 +16,10 @@ interface ApiService {
     suspend fun getItemsAll(@Query("page") page: Int, @Query("perPage") perPage: Int): Response<List<GetItemResponse>>
 
     @POST("api/product")
-    suspend fun insertItem(@Body data: InsertItemRequest): Call<Any>
+    fun insertItem(@Body data: InsertItemRequest): Call<Any>
 
     @PUT("api/product")
-    suspend fun updateItem(@Body data: UpdateItemRequest): Call<Any>
+    fun updateItem(@Body data: UpdateItemRequest): Call<Any>
 
     @DELETE("api/product/{id}")
     fun deleteItem(@Path("id") id: Int): Call<Any>

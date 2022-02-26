@@ -1,12 +1,14 @@
 package uz.akmal.furortask.ui.screens
 
 import android.app.Dialog
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -28,6 +30,9 @@ import uz.akmal.furortask.ui.adapters.ItemAdapter
 import uz.akmal.furortask.util.CurrencyEvent
 import uz.akmal.furortask.util.EventBus
 import uz.akmal.furortask.viewModel.MainViewModel
+import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import java.util.*
 
 @AndroidEntryPoint
@@ -39,6 +44,7 @@ class MainScreen : Fragment(R.layout.fragment_main) {
     private var currentPage = 1
     private val navController by lazy { findNavController() }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         loadViews()
@@ -59,6 +65,7 @@ class MainScreen : Fragment(R.layout.fragment_main) {
         binding.recycler.addOnScrollListener(scrollListener)
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun clickReceiver() {
         adapter.itemClickListener {
             if (navController.currentDestination?.id == R.id.mainScreen) {
@@ -119,6 +126,7 @@ class MainScreen : Fragment(R.layout.fragment_main) {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun openDialog() {
         var named = ""
         var addressed = ""
@@ -156,8 +164,10 @@ class MainScreen : Fragment(R.layout.fragment_main) {
                 }
 
                 if (!inputName.text.isNullOrEmpty() && !inputAddress.text.isNullOrEmpty() && !inputCost.text.isNullOrEmpty()) {
-                    val date = Calendar.getInstance().time
-                    viewModel.insertItem(addressed, costed.toInt(), date.toString(), named, 1)
+                   val date = getCurrentDateTime()
+                    val dateInString = date.toString("yyyy-MM-dd'T'HH:mm:ss'Z'")
+
+                    viewModel.insertItem(addressed, costed.toInt(), dateInString, named, 1)
                     alertDialog.dismiss()
                 }
             }
@@ -166,7 +176,14 @@ class MainScreen : Fragment(R.layout.fragment_main) {
             }
         }
     }
+    fun Date.toString(format: String, locale: Locale = Locale.getDefault()): String {
+        val formatter = SimpleDateFormat(format, locale)
+        return formatter.format(this)
+    }
 
+    fun getCurrentDateTime(): Date {
+        return Calendar.getInstance().time
+    }
     private val scrollListener = object : RecyclerView.OnScrollListener() {
 
         override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
