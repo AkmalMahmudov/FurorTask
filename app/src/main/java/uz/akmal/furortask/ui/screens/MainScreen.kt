@@ -106,7 +106,7 @@ class MainScreen : Fragment(R.layout.fragment_main) {
                     is CurrencyEvent.Loading -> {
                     }
                     is CurrencyEvent.Success<*> -> {
-                        Toast.makeText(context, "item successfully added", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, "this item successfully added", Toast.LENGTH_SHORT).show()
                     }
                     else -> {
                     }
