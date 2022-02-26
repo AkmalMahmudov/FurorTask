@@ -33,7 +33,6 @@ import uz.akmal.furortask.util.EventBus
 import uz.akmal.furortask.viewModel.MainViewModel
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.properties.Delegates
 
 @AndroidEntryPoint
 class MainScreen : Fragment(R.layout.fragment_main) {
@@ -44,16 +43,17 @@ class MainScreen : Fragment(R.layout.fragment_main) {
     private var dialog: BottomSheetDialog? = null
     private var currentPage = 1
     private val navController by lazy { findNavController() }
-    var connection: Boolean = false
+    var connection: Boolean? = null
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        connection = true
         super.onViewCreated(view, savedInstanceState)
         checkInternet()
         loadViews()
         viewModel.getListPaging(1, perPage)
         viewModel.getItemsRoom()
-        clickReceiver()
+//        clickReceiver()
         observe()
 //        addDialog()
     }
@@ -85,9 +85,9 @@ class MainScreen : Fragment(R.layout.fragment_main) {
         binding.recycler.addOnScrollListener(scrollListener)
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
+
     private fun clickReceiver() {
-        if (connection) {
+        if (connection == false) {
             adapter.itemClickListener {
 //            if (navController.currentDestination?.id == R.id.mainScreen) {
 //                dialog?.item=it
@@ -101,19 +101,20 @@ class MainScreen : Fragment(R.layout.fragment_main) {
                     openDialog()
                 }
             }
-        } else {
-            internetDialog()
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun observe() {
         viewModel.getPaeList.observe(viewLifecycleOwner) {
             if (it != null) {
                 when (it) {
                     is CurrencyEvent.Failure -> {
-                        connection = false
                         internetDialog()
                         binding.progressbar.isVisible = false
+                        binding.mode.visibility = View.VISIBLE
+                        connection = false
+                        clickReceiver()
 
                         Snackbar.make(binding.root, it.errorText, Snackbar.LENGTH_SHORT).show()
                     }
@@ -121,6 +122,7 @@ class MainScreen : Fragment(R.layout.fragment_main) {
                         binding.progressbar.isVisible = true
                     }
                     is CurrencyEvent.Success<*> -> {
+                        connection = true
                         binding.progressbar.isVisible = false
                         val list = it.data as ArrayList<GetItemResponse>
                         val list2 = adapter.currentList.toMutableList()
@@ -128,6 +130,7 @@ class MainScreen : Fragment(R.layout.fragment_main) {
                         adapter.submitList(list2)
 //                        viewModel.deleteAllRoom()
                         viewModel.insertAllRoom(list)
+                        clickReceiver()
                     }
                     else -> {
                     }
@@ -244,12 +247,12 @@ class MainScreen : Fragment(R.layout.fragment_main) {
             EventBus.internet.collectLatest {
                 if (!it) {
                     binding.mode.visibility = View.VISIBLE
-                    Toast.makeText(context, "room", Toast.LENGTH_SHORT).show()
                     connection = false
+                    Toast.makeText(context, "room  $connection", Toast.LENGTH_SHORT).show()
                 } else {
                     binding.mode.visibility = View.GONE
-                    Toast.makeText(context, "retrofit", Toast.LENGTH_SHORT).show()
                     connection = true
+                    Toast.makeText(context, "retrofit $connection", Toast.LENGTH_SHORT).show()
                 }
             }
         }
@@ -262,6 +265,17 @@ class MainScreen : Fragment(R.layout.fragment_main) {
             .setPositiveButton("OK") { _, _ -> }
             .setCancelable(false)
             .create().show()
+    }
+
+    private fun check(): Boolean {
+        var answer = false
+        CoroutineScope(Dispatchers.Main).launch {
+            EventBus.internet.collectLatest {
+                answer = it
+                return@collectLatest
+            }
+        }
+        return answer
     }
 
     override fun onDestroyView() {
