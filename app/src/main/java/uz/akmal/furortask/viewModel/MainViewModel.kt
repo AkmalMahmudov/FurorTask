@@ -83,9 +83,9 @@ class MainViewModel @Inject constructor(private val repository: MainRepository) 
         _deleteItem.value = null
     }
 
-  /*  fun navigateUpdate() {
+    fun navigateUpdate() {
         _updateItem.value = null
-    }*/
+    }
 
     fun insertAllRoom(list: List<GetItemResponse>) {
         CoroutineScope(Dispatchers.IO).launch {
@@ -93,7 +93,7 @@ class MainViewModel @Inject constructor(private val repository: MainRepository) 
         }
     }
 
-    fun getItemsRoom() {
+    fun  getItemsRoom() {
         CoroutineScope(Dispatchers.IO).launch {
             _getItemsRoom.postValue(repository.getItemsRoom())
         }

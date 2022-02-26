@@ -39,6 +39,7 @@ class MainScreen : Fragment(R.layout.fragment_main) {
     private val viewModel: MainViewModel by viewModels()
     private lateinit var adapter: ItemAdapter
     private val perPage = 5
+    private var dialog:BottomSheetDialog?=null
     private var currentPage = 1
     private val navController by lazy { findNavController() }
 
@@ -50,11 +51,29 @@ class MainScreen : Fragment(R.layout.fragment_main) {
         viewModel.getItemsRoom()
         clickReceiver()
         observe()
+        addDialog()
+    }
+    private fun addDialog(){
+        dialog = BottomSheetDialog()
+        dialog!!.setTargetFragment(this, 1)
+        dialog!!.itemClickListener {item->
+            val list = adapter.currentList.toMutableList()
+            list.remove(item)
+            adapter.submitList(list)
+        }
+        dialog!!.itemEdit {oldItem, newItem->
+            val list = adapter.currentList.toMutableList()
+            val index=list.indexOf(oldItem)
+            list.remove(oldItem)
+            list.add(index,newItem)
+            adapter.submitList(list)
+        }
     }
 
     private fun loadViews() {
         adapter = ItemAdapter()
-        binding.recycler.layoutManager = LinearLayoutManager(requireActivity(), LinearLayoutManager.VERTICAL, false)
+        binding.recycler.layoutManager =
+            LinearLayoutManager(requireActivity(), LinearLayoutManager.VERTICAL, false)
         binding.recycler.adapter = adapter
         binding.recycler.addOnScrollListener(scrollListener)
     }
@@ -63,7 +82,9 @@ class MainScreen : Fragment(R.layout.fragment_main) {
     private fun clickReceiver() {
         adapter.itemClickListener {
             if (navController.currentDestination?.id == R.id.mainScreen) {
-                navController.navigate(MainScreenDirections.actionMainScreenToBottomSheetDialog(it))
+                dialog?.item=it
+                dialog?.show(parentFragmentManager, dialog?.tag)
+//                navController.navigate(MainScreenDirections.actionMainScreenToBottomSheetDialog(it))
             }
         }
         binding.apply {
@@ -107,7 +128,8 @@ class MainScreen : Fragment(R.layout.fragment_main) {
                     is CurrencyEvent.Loading -> {
                     }
                     is CurrencyEvent.Success<*> -> {
-                        Toast.makeText(context, "this item successfully added", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, "this item successfully added", Toast.LENGTH_SHORT)
+                            .show()
                     }
                     else -> {
                     }
@@ -132,7 +154,10 @@ class MainScreen : Fragment(R.layout.fragment_main) {
             setTitle("Fill the form")
             setContentView(binding.root)
             setCancelable(false)
-            window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+            window?.setLayout(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
             create()
             show()
         }
