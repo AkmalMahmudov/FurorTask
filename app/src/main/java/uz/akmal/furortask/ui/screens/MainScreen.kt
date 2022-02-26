@@ -41,21 +41,18 @@ class MainScreen : Fragment(R.layout.fragment_main) {
     private lateinit var adapter: ItemAdapter
     private val perPage = 5
     private var dialog: BottomSheetDialog? = null
-    val splash = SplashFragment()
     private var currentPage = 1
     private val navController by lazy { findNavController() }
-    var connection: Boolean? = null
     private var internet: String = ""
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        connection = true
         super.onViewCreated(view, savedInstanceState)
         checkInternet()
         loadViews()
         viewModel.getListPaging(1, perPage)
         viewModel.getItemsRoom()
-//        clickReceiver()
+        clickReceiver()
         observe()
 //        addDialog()
     }
@@ -89,17 +86,23 @@ class MainScreen : Fragment(R.layout.fragment_main) {
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun clickReceiver() {
-        Toast.makeText(context, "bool $connection", Toast.LENGTH_SHORT).show()
         adapter.itemClickListener {
 //            if (navController.currentDestination?.id == R.id.mainScreen) {
 //                dialog?.item=it
 //                dialog?.show(parentFragmentManager, dialog?.tag)
-            addDialog(it)
+            if (internet == "yes")
+                addDialog(it)
 //                navController.navigate(MainScreenDirections.actionMainScreenToBottomSheetDialog(it))
         }
         binding.apply {
+            refresh.setOnClickListener {
+                if (internet == "yes") {
+                    viewModel.getListPaging(1, perPage)
+                }
+            }
             fab.setOnClickListener {
-                openDialog()
+                if (internet == "yes")
+                    openDialog()
             }
         }
     }
@@ -110,19 +113,17 @@ class MainScreen : Fragment(R.layout.fragment_main) {
             if (it != null) {
                 when (it) {
                     is CurrencyEvent.Failure -> {
+                        internet = "no"
                         internetDialog()
                         binding.progressbar.isVisible = false
                         binding.mode.visibility = View.VISIBLE
-                        connection = false
-                        clickReceiver()
-
                         Snackbar.make(binding.root, it.errorText, Snackbar.LENGTH_SHORT).show()
                     }
                     is CurrencyEvent.Loading -> {
                         binding.progressbar.isVisible = true
                     }
                     is CurrencyEvent.Success<*> -> {
-                        connection = true
+                        internet = "yes"
                         binding.progressbar.isVisible = false
                         val list = it.data as ArrayList<GetItemResponse>
                         val list2 = adapter.currentList.toMutableList()
@@ -130,7 +131,6 @@ class MainScreen : Fragment(R.layout.fragment_main) {
                         adapter.submitList(list2)
 //                        viewModel.deleteAllRoom()
                         viewModel.insertAllRoom(list)
-                        clickReceiver()
                     }
                     else -> {
                     }
@@ -231,11 +231,13 @@ class MainScreen : Fragment(R.layout.fragment_main) {
             val layoutManager = recyclerView.layoutManager as LinearLayoutManager
             if (currentPage++ == 1 && dy <= 0) {
                 viewModel.getListPaging(currentPage, perPage)
+                binding.fab.show()
 //                currentPage++
             } else {
                 if (layoutManager.findLastVisibleItemPosition() >= currentPage * perPage - 1) {
                     viewModel.getListPaging(currentPage, perPage)
                     currentPage++
+                    binding.fab.hide()
                     Log.d("mkm", "onScrolled: $currentPage ")
                 }
             }
@@ -246,14 +248,13 @@ class MainScreen : Fragment(R.layout.fragment_main) {
         CoroutineScope(Dispatchers.Main).launch {
             EventBus.internet.collectLatest {
                 if (!it) {
+                    internet = "no"
                     binding.mode.visibility = View.VISIBLE
-                    connection = false
-                    Toast.makeText(context, "room  $connection", Toast.LENGTH_SHORT).show()
-
+                    Toast.makeText(context, "room", Toast.LENGTH_SHORT).show()
                 } else {
+                    internet = "yes"
                     binding.mode.visibility = View.GONE
-                    connection = true
-                    Toast.makeText(context, "retrofit $connection", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "retrofit", Toast.LENGTH_SHORT).show()
                 }
             }
         }
@@ -266,17 +267,6 @@ class MainScreen : Fragment(R.layout.fragment_main) {
             .setPositiveButton("OK") { _, _ -> }
             .setCancelable(false)
             .create().show()
-    }
-
-    private fun check(): Boolean {
-        var answer = false
-        CoroutineScope(Dispatchers.Main).launch {
-            EventBus.internet.collectLatest {
-                answer = it
-                return@collectLatest
-            }
-        }
-        return answer
     }
 
     override fun onDestroyView() {

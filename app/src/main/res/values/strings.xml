@@ -11,4 +11,5 @@
     <string name="cancel">cancel</string>
     <string name="fill_the_form">Fill the form</string>
     <string name="offline_mode">Offline Mode</string>
+    <string name="connection_lost_to_make_changes_go_online">Connection lost. To make changes go online</string>
 </resources>

@@ -64,7 +64,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="#353535"
-        android:text="@string/offline_mode"
+        android:text="@string/connection_lost_to_make_changes_go_online"
         android:textAlignment="center"
         android:textColor="@color/white"
         android:visibility="gone"
@@ -88,6 +88,7 @@
         android:contentDescription="@string/todo"
         android:focusable="true"
         android:src="@drawable/ic_add"
+        app:layout_behavior="com.google.android.material.behavior.HideBottomViewOnScrollBehavior"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:tint="@android:color/white" />
